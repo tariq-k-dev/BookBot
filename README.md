@@ -1,2 +1,3 @@
 # BookBot
-Use Python to analyze text data
+
+BookBot is my first [Boot.dev](https://www.boot.dev) project!
