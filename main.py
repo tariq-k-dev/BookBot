@@ -1,60 +1,37 @@
-from os import name, system
-
-BOOK_PATH = "books/frankenstein.txt"
-
-
-def clear() -> None:
-    """Clears console at start of program."""
-    if name == "nt":
-        system("cls")
-    else:
-        system("clear")
+import sys
+import textwrap
+from stats import get_num_words, letters_count
 
 
-def word_count(book) -> int:
-    """Takes a book's text as input\nReturns total number of words."""
-    return len(book.split())
+def get_book_text(book_path: str) -> str:
+    """Get the text of a book from a file."""
+    with open(book_path, "r") as f:
+        book_text = f.read()
+    return book_text
 
 
-def character_count(book: str) -> dict:
-    """
-    Takes a book's text as input.\n
-    Returns a dictionary of letters as keys with their total counts as values.
-    """
+def main():
+    """Main function to run the program."""
+    if len(sys.argv) == 1:
+        print("Usage: python3 main.py <path_to_book>")
+        sys.exit(1)
 
-    letter_count = {}
-
-    for char in book:
-        if not char.isalpha():
-            continue
-
-        letter = char.lower()
-        if letter not in letter_count:
-            letter_count[letter] = 1
-        else:
-            letter_count[letter] += 1
-
-    # Sort letter_count
-    letter_keys = list(letter_count.keys())
-    letter_keys.sort()
-    sorted_letters = {key: letter_count[key] for key in letter_keys}
-
-    return sorted_letters
+    BOOK_PATH = sys.argv[1]
+    book_text = get_book_text(BOOK_PATH)
+    book_words = get_num_words(book_text)
+    letter_count = letters_count(book_text)
+    book_report = textwrap.dedent(f"""
+    ============ BOOKBOT ============
+    Analyzing book found at {BOOK_PATH}...
+    ----------- Word Count ----------
+    Found {book_words} total words
+    --------- Character Count -------
+    """)
+    for letter, count in sorted(letter_count.items()):
+        book_report += f"{letter}: {count}\n"
+    book_report += "============= END ==============="
+    print(book_report)
 
 
-def book_report(book_content: str) -> None:
-    """Prints a summary of a books word and letter count inb the console"""
-
-    clear()
-    print(f"--- Begin report of {BOOK_PATH} ---\n")
-    print(f"{word_count(book_content)} words found in the document\n")
-
-    for letter, count in character_count(book_content).items():
-        print(f"The '{letter}' character was found {count} times")
-    print("\n--- End report ---\n")
-
-
-# Get a book's text content, and generate a report
-with open(BOOK_PATH) as f:
-    file_contents = f.read()
-    book_report(file_contents)
+if __name__ == "__main__":
+    main()
